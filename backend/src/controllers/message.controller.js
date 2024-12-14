@@ -45,6 +45,9 @@ export const sendMessages = async (req, res) => {
             image: imageUrl
         });
         await newMessage.save();
+
+        //todo real time message
+
         res.status(201).json(newMessage);
 
     } catch (error) {
