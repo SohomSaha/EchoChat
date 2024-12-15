@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
 
 export const signup= async (req,res)=>{
-   const {fullName, email, password} = req.body;
+   const {fullName, email, password,profilePic} = req.body;
     try{
         //hash password
         if(!fullName || !email || !password){
@@ -29,6 +29,7 @@ export const signup= async (req,res)=>{
             fullName,
             email,
             password: hashedPassword,
+            profilePic,
         })
         if(newUser){
             generateToken(newUser._id, res);

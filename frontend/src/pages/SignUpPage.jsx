@@ -20,6 +20,7 @@ function SignUpPage() {
     fullName: "",
     email: "",
     password: "",
+    profilePic:"",
   });
 
   const { signup, isSigningUp } = useAuthStore();
@@ -37,7 +38,11 @@ function SignUpPage() {
     e.preventDefault();
     const success=validateForm();
     if (success===true) {
-      signup(formData);
+      const uniqueId = encodeURIComponent(formData.fullName.trim().split(" ")[0]); // Use email or any unique string
+    const profilePicUrl = `https://avatar.iran.liara.run/public/boy?username=${uniqueId}`;
+    // Add the profilePic to formData
+    const finalFormData = { ...formData, profilePic: profilePicUrl };
+      signup(finalFormData);
       //toast.success("Account created successfully");
     }
   };

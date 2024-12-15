@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { Navigate } from "react-router-dom";
-import { updateProfile } from "../../../backend/src/controllers/auth.controller";
 export const useAuthStore = create((set) => ({
   authUser: null,
   isSigningUp: false,
@@ -58,7 +57,7 @@ export const useAuthStore = create((set) => ({
           set({ isLoggingIn: false });
         }
     },
-   /* updateProfile: async (data) => {
+    updateProfile: async (data) => {
       
-    }*/
+    }
 }));

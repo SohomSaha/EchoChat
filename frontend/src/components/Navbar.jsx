@@ -32,10 +32,15 @@ function Navbar() {
                 <>
                 <Link
                 to="/profile"
-                className="btn btn-sm gap-2"
+                className="px-5 gap-2 bg-inherit border-0 hover:bg-inherit"
                 >
-                <User className="size-5" />  
-                <span className="hidden sm:inline">Profile</span>
+                <img
+                src={authUser.profilePic}
+                alt="Profile"
+                className="size-7 rounded-full object-cover border-1"
+                onClick="/profile"
+              />  
+              { /* <span className="hidden sm:inline">{authUser.fullName.trim().split(" ")[0]}</span>*/}
                 </Link>
 
                 <button
