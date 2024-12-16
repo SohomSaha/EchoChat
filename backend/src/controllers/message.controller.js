@@ -1,6 +1,6 @@
 import cloudinary from "../lib/cloudinary.js";
 import Message from "../models/message.model.js";
-
+import User from "../models/user.model.js";
 
 export const getUsersForSideBars = async (req, res) => {
     try{
@@ -18,8 +18,8 @@ export const getMessages = async (req, res) => {
         const myId = req.user._id;
         const messages = await Message.find({
         $or: [
-            { sender: myId, recipient: userToChatId },
-            { sender: userToChatId, recipient: myId },
+            { senderId: myId, receiverId: userToChatId },
+            { senderId: userToChatId, receiverId: myId },
         ]})
         res.status(200).json(messages);
     } catch (error) {
@@ -35,7 +35,7 @@ export const sendMessages = async (req, res) => {
         const senderId = req.user._id;
         let imageUrl;
         if(image){
-            const uploadResponse = await cloudinary.uploader.uploadImage(image);
+            const uploadResponse = await cloudinary.uploader.upload(image);
             imageUrl = uploadResponse.secure_url;
         }
         const newMessage = new Message({
