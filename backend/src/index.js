@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin:"https://echo-chat-12.vercel.app/",
+    origin:"https://echo-chat-12.vercel.app",
     credentials: true,
   })
 );
