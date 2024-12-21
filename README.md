@@ -13,6 +13,9 @@
 - **User Authentication** : Secure JWT-based login and registration.
 
 - **User Profiles** : Manage and customize profiles with avatars.
+
+  ![image](https://github.com/user-attachments/assets/abbf6d51-8be7-4910-b84f-6eaae1e05dc5)
+
 - **Responsive UI** : Built with React and Tailwind CSS for a seamless experience across devices.
 - **Theming** : Multiple theme options for personalized user experience.
 ![image](https://github.com/user-attachments/assets/37a28126-0d9d-4020-bf18-0e24dfb70681)
