@@ -38,7 +38,7 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={authUser ? <HomePage /> : <Navigate to="/login" />}
+              element={authUser ? <HomePage /> : <Navigate to="/signup" />}
             />
             <Route
               path="/signup"
@@ -50,7 +50,7 @@ function App() {
             />
             <Route
               path="/profile"
-              element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
+              element={authUser ? <ProfilePage /> : <Navigate to="/" />}
             />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
