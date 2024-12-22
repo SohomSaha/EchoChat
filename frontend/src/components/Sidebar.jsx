@@ -10,14 +10,14 @@ const Sidebar = () => {
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
-  const socket=io();
+ // const socket=io();
 
   useEffect(() => {
     getUsers();
 
-    socket.on("userUpdated", () => {
-      getUsers(); // Refetch users and update the sidebar
-    });
+    //socket.on("userUpdated", () => {
+    ////  getUsers(); // Refetch users and update the sidebar
+   // });
   }, [getUsers]);
 
   const filteredUsers = showOnlineOnly
