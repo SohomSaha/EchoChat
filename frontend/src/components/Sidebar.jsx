@@ -3,15 +3,21 @@ import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import { Users } from "lucide-react";
-
+import { io } from "socket.io-client"; 
 const Sidebar = () => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
 
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
+  const socket=io();
+
   useEffect(() => {
     getUsers();
+
+    socket.on("userUpdated", () => {
+      getUsers(); // Refetch users and update the sidebar
+    });
   }, [getUsers]);
 
   const filteredUsers = showOnlineOnly
