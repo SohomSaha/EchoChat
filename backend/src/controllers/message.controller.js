@@ -4,11 +4,31 @@ import User from "../models/user.model.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export const getUsersForSideBars = async (req, res) => {
-    try{
+    try {
         const loggedInUserId = req.user._id;
-        const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
-        res.status(200).json(filteredUsers);
-    }catch(err){
+        
+        // Get the most recent message between the logged-in user and others
+        const messages = await Message.aggregate([
+            { $match: { $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }] } },
+            { $group: { 
+                _id: { $cond: [{ $eq: ["$senderId", loggedInUserId] }, "$receiverId", "$senderId"] },
+                lastMessageDate: { $max: "$createdAt" }
+            }},
+            { $lookup: { 
+                from: "users", 
+                localField: "_id", 
+                foreignField: "_id", 
+                as: "user" 
+            }},
+            { $unwind: "$user" },
+            { $project: { "user.password": 0 } }
+        ]);
+
+        // Sort users based on the most recent message date
+        const sortedUsers = messages.sort((a, b) => b.lastMessageDate - a.lastMessageDate);
+
+        res.status(200).json(sortedUsers.map(item => item.user));
+    } catch (err) {
         console.log(err.message);
         res.status(500).send("Server error");
     }
