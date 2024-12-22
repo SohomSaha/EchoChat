@@ -7,27 +7,40 @@ export const getUsersForSideBars = async (req, res) => {
     try {
         const loggedInUserId = req.user._id;
         
+        // Get all users except the logged-in user
+        const users = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+
         // Get the most recent message between the logged-in user and others
         const messages = await Message.aggregate([
             { $match: { $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }] } },
             { $group: { 
                 _id: { $cond: [{ $eq: ["$senderId", loggedInUserId] }, "$receiverId", "$senderId"] },
                 lastMessageDate: { $max: "$createdAt" }
-            }},
-            { $lookup: { 
-                from: "users", 
-                localField: "_id", 
-                foreignField: "_id", 
-                as: "user" 
-            }},
-            { $unwind: "$user" },
-            { $project: { "user.password": 0 } }
+            }}
         ]);
 
-        // Sort users based on the most recent message date
-        const sortedUsers = messages.sort((a, b) => b.lastMessageDate - a.lastMessageDate);
+        // Map the messages to a user map for easy lookup
+        const userMessagesMap = messages.reduce((acc, message) => {
+            acc[message._id] = message.lastMessageDate;
+            return acc;
+        }, {});
 
-        res.status(200).json(sortedUsers.map(item => item.user));
+        // Merge the users with their last message dates
+        const usersWithMessages = users.map(user => {
+            const lastMessageDate = userMessagesMap[user._id] || new Date(0);  // If no messages, assign an old date
+            return { ...user.toObject(), lastMessageDate };  // Attach the last message date
+        });
+
+        // Sort users based on the most recent message date
+        const sortedUsers = usersWithMessages.sort((a, b) => {
+            // If both users have no message activity (i.e., both have new Date(0)), they should be ordered by their user ID
+            if (a.lastMessageDate.getTime() === 0 && b.lastMessageDate.getTime() === 0) {
+                return a.fullName.localeCompare(b.fullName); // Sort alphabetically for users without message activity
+            }
+            return b.lastMessageDate - a.lastMessageDate; // Sort users with messages first
+        });
+
+        res.status(200).json(sortedUsers);
     } catch (err) {
         console.log(err.message);
         res.status(500).send("Server error");
