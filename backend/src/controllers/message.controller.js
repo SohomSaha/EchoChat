@@ -86,6 +86,14 @@ export const sendMessages = async (req, res) => {
         // Save the new message to the database
         await newMessage.save();
 
+        // Emit the 'userUpdated' event to refresh both sender and receiver's sidebar
+        if (connectedUsers[senderId]) {
+            io.to(connectedUsers[senderId]).emit("userUpdated", { senderId, receiverId });
+        }
+
+        if (connectedUsers[receiverId]) {
+            io.to(connectedUsers[receiverId]).emit("userUpdated", { senderId, receiverId });
+        }
         // Emit the new message to the receiver
         const receiverSocketId = getReceiverSocketId(receiverId);
         if (receiverSocketId) {
@@ -93,7 +101,7 @@ export const sendMessages = async (req, res) => {
         }
 
         // Emit the 'userUpdated' event to refresh both sender and receiver's sidebar
-        io.emit("userUpdated", { senderId, receiverId });
+        
 
 
         // Send a response with the newly created message
