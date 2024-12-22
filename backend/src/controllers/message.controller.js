@@ -95,11 +95,6 @@ export const sendMessages = async (req, res) => {
         // Emit the 'userUpdated' event to refresh both sender and receiver's sidebar
         io.emit("userUpdated", { senderId, receiverId });
 
-        // Optionally, you can emit a 'newMessage' to the sender as well, if needed
-        const senderSocketId = getReceiverSocketId(senderId);
-        if (senderSocketId) {
-            io.to(senderSocketId).emit("newMessage", newMessage); // Optionally for sender
-        }
 
         // Send a response with the newly created message
         res.status(201).json(newMessage);
