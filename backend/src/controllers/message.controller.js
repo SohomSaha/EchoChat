@@ -64,28 +64,44 @@ export const getMessages = async (req, res) => {
 
 export const sendMessages = async (req, res) => {
     try {
-        const {text,image} = req.body;
-        const {id: receiverId } = req.params;
+        const { text, image } = req.body;
+        const { id: receiverId } = req.params;
         const senderId = req.user._id;
         let imageUrl;
-        if(image){
+
+        // Upload the image to Cloudinary if an image is provided
+        if (image) {
             const uploadResponse = await cloudinary.uploader.upload(image);
             imageUrl = uploadResponse.secure_url;
         }
+
+        // Create a new message document
         const newMessage = new Message({
             senderId,
             receiverId,
             text,
             image: imageUrl
         });
+
+        // Save the new message to the database
         await newMessage.save();
 
-        // real time message
+        // Emit the new message to the receiver
         const receiverSocketId = getReceiverSocketId(receiverId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
-    }
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
 
+        // Emit the 'userUpdated' event to refresh both sender and receiver's sidebar
+        io.emit("userUpdated", { senderId, receiverId });
+
+        // Optionally, you can emit a 'newMessage' to the sender as well, if needed
+        const senderSocketId = getReceiverSocketId(senderId);
+        if (senderSocketId) {
+            io.to(senderSocketId).emit("newMessage", newMessage); // Optionally for sender
+        }
+
+        // Send a response with the newly created message
         res.status(201).json(newMessage);
 
     } catch (error) {
